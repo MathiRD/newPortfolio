@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8fafc;
+  --background-alt: #eef4ff;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.9);
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: rgba(148, 163, 184, 0.28);
+  --primary: #2563eb;
+  --primary-strong: #1d4ed8;
+  --accent: #06b6d4;
+  --ring: rgba(37, 99, 235, 0.24);
+  --noise: rgba(15, 23, 42, 0.04);
+}
+
+.dark {
+  --background: #020617;
+  --background-alt: #0f172a;
+  --surface: rgba(15, 23, 42, 0.58);
+  --surface-strong: rgba(15, 23, 42, 0.86);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --border: rgba(148, 163, 184, 0.18);
+  --primary: #60a5fa;
+  --primary-strong: #3b82f6;
+  --accent: #22d3ee;
+  --ring: rgba(96, 165, 250, 0.24);
+  --noise: rgba(255, 255, 255, 0.05);
+}
+
+
+.palette-ocean {
+  --primary: #2563eb;
+  --primary-strong: #1d4ed8;
+  --accent: #06b6d4;
+  --ring: rgba(37, 99, 235, 0.24);
+}
+
+.dark.palette-ocean {
+  --primary: #60a5fa;
+  --primary-strong: #3b82f6;
+  --accent: #22d3ee;
+  --ring: rgba(96, 165, 250, 0.24);
+}
+
+.palette-emerald {
+  --primary: #059669;
+  --primary-strong: #047857;
+  --accent: #14b8a6;
+  --ring: rgba(5, 150, 105, 0.22);
+}
+
+.dark.palette-emerald {
+  --primary: #34d399;
+  --primary-strong: #10b981;
+  --accent: #2dd4bf;
+  --ring: rgba(52, 211, 153, 0.22);
+}
+
+.palette-violet {
+  --primary: #7c3aed;
+  --primary-strong: #6d28d9;
+  --accent: #a855f7;
+  --ring: rgba(124, 58, 237, 0.22);
+}
+
+.dark.palette-violet {
+  --primary: #a78bfa;
+  --primary-strong: #8b5cf6;
+  --accent: #c084fc;
+  --ring: rgba(167, 139, 250, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 24%, transparent), transparent 34rem),
+    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 28rem),
+    linear-gradient(135deg, var(--background), var(--background-alt));
+  color: var(--text);
+}
+
+body::before {
+  pointer-events: none;
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--noise) 1px, transparent 1px),
+    linear-gradient(90deg, var(--noise) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.liquid-glass {
+  position: relative;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 86%, white 8%), color-mix(in srgb, var(--surface) 72%, transparent)),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.32), transparent 44%);
+  box-shadow: 0 24px 90px rgba(2, 6, 23, 0.12);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.dark .liquid-glass {
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.36);
+}
+
+.liquid-glass::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.22), transparent 36%);
+}
+
+.button-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  color: white;
+  box-shadow: 0 16px 40px var(--ring);
+}
+
+.button-soft {
+  color: var(--text);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-strong) 72%, transparent);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.border-theme {
+  border-color: var(--border);
+}
+
+.bg-surface {
+  background: var(--surface);
+}
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus {
+  box-shadow: 0 0 0 4px var(--ring);
+}
