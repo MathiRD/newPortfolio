@@ -55,8 +55,8 @@ export default async function HomePage() {
           <div className="animate-fade-up lg:justify-self-end" style={{ animationDelay: "120ms" }}>
             <div className="liquid-glass relative overflow-hidden rounded-[2.5rem] p-5">
               <div className="absolute right-8 top-8 h-24 w-24 rounded-full bg-[var(--primary)] opacity-20 blur-3xl" />
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-theme bg-surface">
-                <div className="flex h-full flex-col justify-between p-8">
+              <div className="relative min-h-[420px] overflow-hidden rounded-[2rem] border border-theme bg-surface">
+                <div className="flex min-h-[420px] flex-col justify-between p-8">
                   <div>
                     <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl button-primary text-3xl font-black shadow-glow">
                       MD
