@@ -36,42 +36,71 @@ export async function submitContactMessage(
   const ipAddress = getClientIpAddress();
   const userAgent = getUserAgent();
   const cooldownSeconds = Number(process.env.CONTACT_RATE_LIMIT_SECONDS ?? 3600);
-  const rateLimitKey = `portfolio:contact-rate:${ipAddress}:${parsed.data.email.toLowerCase()}`;
+  const normalizedEmail = parsed.data.email.toLowerCase();
 
-  if (redis) {
-    try {
-      const wasCreated = await redis.set(rateLimitKey, "1", "EX", cooldownSeconds, "NX");
-      if (wasCreated !== "OK") {
-        return { status: "rate_limited" };
-      }
-    } catch {
-      // Falls back to database check below.
-    }
-  }
+  const isRateLimited = await checkContactRateLimit({
+    ipAddress,
+    email: normalizedEmail,
+    cooldownSeconds
+  });
 
-  if (!redis) {
-    const recentMessage = await prisma.contactMessage.findFirst({
-      where: {
-        email: parsed.data.email,
-        ipAddress,
-        createdAt: {
-          gte: new Date(Date.now() - cooldownSeconds * 1000)
-        }
-      }
-    });
-
-    if (recentMessage) {
-      return { status: "rate_limited" };
-    }
+  if (isRateLimited) {
+    return { status: "rate_limited" };
   }
 
   await prisma.contactMessage.create({
     data: {
       ...parsed.data,
+      email: normalizedEmail,
       ipAddress,
       userAgent
     }
   });
 
   return { status: "success" };
+}
+
+async function checkContactRateLimit({
+  ipAddress,
+  email,
+  cooldownSeconds
+}: {
+  ipAddress: string;
+  email: string;
+  cooldownSeconds: number;
+}): Promise<boolean> {
+  const rateLimitKeys = [
+    `portfolio:contact-rate:ip:${ipAddress}`,
+    `portfolio:contact-rate:email:${email}`
+  ];
+
+  if (redis) {
+    try {
+      const results = await Promise.all(
+        rateLimitKeys.map((key) => redis.set(key, "1", "EX", cooldownSeconds, "NX"))
+      );
+
+      const hasAlreadySubmitted = results.some((result) => result !== "OK");
+
+      if (hasAlreadySubmitted) {
+        return true;
+      }
+
+      return false;
+    } catch {
+      // If Redis is unavailable in production, use database fallback below.
+    }
+  }
+
+  const recentMessage = await prisma.contactMessage.findFirst({
+    where: {
+      OR: [{ email }, { ipAddress }],
+      createdAt: {
+        gte: new Date(Date.now() - cooldownSeconds * 1000)
+      }
+    },
+    select: { id: true }
+  });
+
+  return Boolean(recentMessage);
 }

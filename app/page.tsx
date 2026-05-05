@@ -55,8 +55,8 @@ export default async function HomePage() {
           <div className="animate-fade-up lg:justify-self-end" style={{ animationDelay: "120ms" }}>
             <div className="liquid-glass relative overflow-hidden rounded-[2.5rem] p-5">
               <div className="absolute right-8 top-8 h-24 w-24 rounded-full bg-[var(--primary)] opacity-20 blur-3xl" />
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-theme bg-surface">
-                <div className="flex h-full flex-col justify-between p-8">
+              <div className="relative min-h-[420px] rounded-[2rem] border border-theme bg-surface">
+                <div className="flex min-h-[420px] flex-col justify-between p-8">
                   <div>
                     <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl button-primary text-3xl font-black shadow-glow">
                       MD
@@ -67,7 +67,7 @@ export default async function HomePage() {
 
                   <div className="space-y-2">
                     <p className="text-sm font-bold text-muted">{copy.stackLabel}</p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-2 pb-1">
                       {["Node.js", "Laravel", "PostgreSQL", "Redis", "Docker", "TypeScript"].map((skill) => (
                         <span key={skill} className="rounded-2xl border border-theme bg-white/10 px-3 py-2 text-sm font-semibold">
                           {skill}
