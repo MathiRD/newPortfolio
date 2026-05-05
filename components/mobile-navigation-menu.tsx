@@ -12,6 +12,7 @@ type MobileNavigationMenuProps = {
 
 const preferenceCookieMaxAge = 60 * 60 * 24 * 365;
 const mobileColorPalette = "ocean";
+const mobileMediaQuery = "(max-width: 767px)";
 
 export function MobileNavigationMenu({ locale, themeMode }: MobileNavigationMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,28 +21,39 @@ export function MobileNavigationMenu({ locale, themeMode }: MobileNavigationMenu
 
   useEffect(() => {
     const storedThemeMode = readStoredThemeMode() ?? themeMode;
-
     setSelectedThemeMode(storedThemeMode);
-    applyMobileVisualPreferences(storedThemeMode);
 
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const viewportQuery = window.matchMedia(mobileMediaQuery);
+    const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    function handleSystemThemeChange() {
-      const currentThemeMode = readCurrentThemeMode(storedThemeMode);
-
-      if (currentThemeMode === "system") {
-        applyMobileVisualPreferences(currentThemeMode);
+    function syncMobilePreferences() {
+      if (!viewportQuery.matches) {
+        setIsOpen(false);
+        return;
       }
+
+      const currentThemeMode = readCurrentThemeMode(storedThemeMode);
+      applyMobileVisualPreferences(currentThemeMode);
     }
 
-    mediaQuery.addEventListener("change", handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
+    syncMobilePreferences();
+
+    viewportQuery.addEventListener("change", syncMobilePreferences);
+    systemThemeQuery.addEventListener("change", syncMobilePreferences);
+
+    return () => {
+      viewportQuery.removeEventListener("change", syncMobilePreferences);
+      systemThemeQuery.removeEventListener("change", syncMobilePreferences);
+    };
   }, [themeMode]);
 
   function handleThemeModeChange(nextThemeMode: ThemeMode) {
     setSelectedThemeMode(nextThemeMode);
     persistPreference("portfolio_theme_mode", nextThemeMode);
-    applyMobileVisualPreferences(nextThemeMode);
+
+    if (isMobileViewport()) {
+      applyMobileVisualPreferences(nextThemeMode);
+    }
   }
 
   function toggleLocale() {
@@ -178,6 +190,10 @@ function readCurrentThemeMode(fallbackThemeMode: ThemeMode): ThemeMode {
 function readStoredThemeMode(): ThemeMode | null {
   const value = localStorage.getItem("portfolio_theme_mode");
   return isThemeMode(value) ? value : null;
+}
+
+function isMobileViewport(): boolean {
+  return window.matchMedia(mobileMediaQuery).matches;
 }
 
 function isThemeMode(value: unknown): value is ThemeMode {
