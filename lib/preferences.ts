@@ -51,6 +51,7 @@ export const dictionary = {
     aboutTitle: "About",
     aboutDescription:
       "I work across backend architecture, database optimization, API design, Redis caching and legacy refactoring. Although my focus is backend, I can deliver full-stack features when needed.",
+    aboutHeadline: "Backend focus with full-stack delivery.",
     aboutHighlightOne: "Production systems",
     aboutHighlightTwo: "PostgreSQL performance",
     aboutHighlightThree: "Clean and maintainable code",
@@ -93,6 +94,7 @@ export const dictionary = {
     aboutTitle: "Sobre",
     aboutDescription:
       "Atuo com arquitetura backend, otimização de banco de dados, design de APIs, cache com Redis e refatoração de sistemas legados. Apesar do foco em backend, também entrego funcionalidades full stack quando necessário.",
+    aboutHeadline: "Foco em backend com entrega full stack.",
     aboutHighlightOne: "Sistemas em produção",
     aboutHighlightTwo: "Performance em PostgreSQL",
     aboutHighlightThree: "Código limpo e sustentável",

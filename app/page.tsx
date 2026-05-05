@@ -67,7 +67,7 @@ export default async function HomePage() {
 
                   <div className="space-y-2">
                     <p className="text-sm font-bold text-muted">{copy.stackLabel}</p>
-                    <div className="grid grid-cols-2 gap-2 pb-1">
+                    <div className="grid grid-cols-2 gap-2">
                       {["Node.js", "Laravel", "PostgreSQL", "Redis", "Docker", "TypeScript"].map((skill) => (
                         <span key={skill} className="rounded-2xl border border-theme bg-white/10 px-3 py-2 text-sm font-semibold">
                           {skill}
@@ -86,7 +86,7 @@ export default async function HomePage() {
             <div>
               <p className="mb-3 text-sm font-bold uppercase tracking-[0.28em] text-muted">{copy.aboutTitle}</p>
               <h2 className="text-4xl font-black tracking-tight md:text-5xl">
-                Backend focus with full-stack delivery.
+                {copy.aboutHeadline}
               </h2>
             </div>
 
