@@ -74,10 +74,14 @@ async function checkContactRateLimit({
     `portfolio:contact-rate:email:${email}`
   ];
 
-  if (redis) {
+  const redisClient = redis;
+
+  if (redisClient) {
     try {
       const results = await Promise.all(
-        rateLimitKeys.map((key) => redis.set(key, "1", "EX", cooldownSeconds, "NX"))
+        rateLimitKeys.map((key) =>
+          redisClient.set(key, "1", "EX", cooldownSeconds, "NX")
+        )
       );
 
       const hasAlreadySubmitted = results.some((result) => result !== "OK");
