@@ -5,74 +5,65 @@
 :root {
   --background: #f8fafc;
   --background-alt: #eef4ff;
-  --surface: rgba(255, 255, 255, 0.72);
-  --surface-strong: rgba(255, 255, 255, 0.9);
+  --surface: rgba(255, 255, 255, 0.74);
+  --surface-strong: rgba(255, 255, 255, 0.92);
   --text: #0f172a;
   --muted: #64748b;
   --border: rgba(148, 163, 184, 0.28);
   --primary: #2563eb;
   --primary-strong: #1d4ed8;
   --accent: #06b6d4;
+  --accent-two: #8b5cf6;
   --ring: rgba(37, 99, 235, 0.24);
   --noise: rgba(15, 23, 42, 0.04);
+  --scroll-progress: 0;
+  --journey-progress: 18%;
+  --bg-hue: 215deg;
+  --bg-pan-x: 0px;
+  --bg-pan-y: 0px;
+  --bg-pan-x-soft: 0px;
+  --bg-pan-y-soft: 0px;
+  --ribbon-x: 0px;
+  --ribbon-y: 0px;
+  --ribbon-y-neg: 0px;
+  --beam-shift: 0px;
+  --grid-shift: 0px;
 }
 
 .dark {
   --background: #020617;
   --background-alt: #0f172a;
-  --surface: rgba(15, 23, 42, 0.58);
-  --surface-strong: rgba(15, 23, 42, 0.86);
+  --surface: rgba(15, 23, 42, 0.6);
+  --surface-strong: rgba(15, 23, 42, 0.88);
   --text: #f8fafc;
   --muted: #94a3b8;
   --border: rgba(148, 163, 184, 0.18);
   --primary: #60a5fa;
   --primary-strong: #3b82f6;
   --accent: #22d3ee;
+  --accent-two: #818cf8;
   --ring: rgba(96, 165, 250, 0.24);
   --noise: rgba(255, 255, 255, 0.05);
 }
 
-
-.palette-ocean {
+.palette-ocean,
+.palette-emerald,
+.palette-violet {
   --primary: #2563eb;
   --primary-strong: #1d4ed8;
   --accent: #06b6d4;
+  --accent-two: #8b5cf6;
   --ring: rgba(37, 99, 235, 0.24);
 }
 
-.dark.palette-ocean {
+.dark.palette-ocean,
+.dark.palette-emerald,
+.dark.palette-violet {
   --primary: #60a5fa;
   --primary-strong: #3b82f6;
   --accent: #22d3ee;
+  --accent-two: #818cf8;
   --ring: rgba(96, 165, 250, 0.24);
-}
-
-.palette-emerald {
-  --primary: #059669;
-  --primary-strong: #047857;
-  --accent: #14b8a6;
-  --ring: rgba(5, 150, 105, 0.22);
-}
-
-.dark.palette-emerald {
-  --primary: #34d399;
-  --primary-strong: #10b981;
-  --accent: #2dd4bf;
-  --ring: rgba(52, 211, 153, 0.22);
-}
-
-.palette-violet {
-  --primary: #7c3aed;
-  --primary-strong: #6d28d9;
-  --accent: #a855f7;
-  --ring: rgba(124, 58, 237, 0.22);
-}
-
-.dark.palette-violet {
-  --primary: #a78bfa;
-  --primary-strong: #8b5cf6;
-  --accent: #c084fc;
-  --ring: rgba(167, 139, 250, 0.22);
 }
 
 * {
@@ -85,10 +76,8 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 24%, transparent), transparent 34rem),
-    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 28rem),
-    linear-gradient(135deg, var(--background), var(--background-alt));
+  overflow-x: hidden;
+  background: linear-gradient(135deg, var(--background), var(--background-alt));
   color: var(--text);
 }
 
@@ -97,16 +86,137 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   background-image:
     linear-gradient(var(--noise) 1px, transparent 1px),
     linear-gradient(90deg, var(--noise) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: linear-gradient(to bottom, black, transparent 85%);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
 }
 
 ::selection {
   background: color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.site-shell {
+  width: min(1480px, calc(100vw - 2rem));
+  margin-inline: auto;
+}
+
+.section-spacing {
+  padding-block: clamp(4rem, 8vw, 7.5rem);
+}
+
+.scroll-background {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 32%),
+    linear-gradient(135deg, var(--background), var(--background-alt));
+  isolation: isolate;
+}
+
+.scroll-background__base {
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(ellipse at 18% 12%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 34%),
+    radial-gradient(ellipse at 82% 18%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 32%),
+    radial-gradient(ellipse at 54% 86%, color-mix(in srgb, var(--accent-two) 12%, transparent), transparent 36%);
+  opacity: 0.72;
+  animation: atmosphereShift 11s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.scroll-background__grid {
+  position: absolute;
+  inset: auto -16% -36% -16%;
+  height: 74%;
+  opacity: 0.28;
+  transform: perspective(900px) rotateX(63deg) translate3d(var(--bg-grid-x), var(--bg-grid-y), 0);
+  transform-origin: bottom center;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--primary) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--primary) 22%, transparent) 1px, transparent 1px);
+  background-size: 74px 74px;
+  animation: gridBreathing 5.2s linear infinite;
+  will-change: transform, background-position;
+}
+
+.scroll-background__streaks {
+  position: absolute;
+  inset: -18%;
+  opacity: 0.26;
+  background:
+    repeating-linear-gradient(
+      116deg,
+      transparent 0 118px,
+      color-mix(in srgb, var(--primary) 14%, transparent) 122px,
+      transparent 128px,
+      transparent 248px,
+      color-mix(in srgb, var(--accent) 12%, transparent) 252px,
+      transparent 258px
+    );
+  transform: translate3d(var(--bg-streak-x), var(--bg-streak-y), 0) rotate(-1deg);
+  animation: streakSoftMove 7s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.scroll-background__lights {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.scroll-light {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  opacity: 0.68;
+  filter: blur(0.5px);
+  will-change: transform, opacity;
+}
+
+.scroll-light--left {
+  left: -16vw;
+  top: 10vh;
+  width: 70vw;
+  height: 28vh;
+  background: linear-gradient(104deg, transparent 0 16%, color-mix(in srgb, var(--primary) 28%, transparent) 42%, transparent 72%);
+  transform: translate3d(var(--light-left-x), var(--light-left-y), 0) rotate(-14deg);
+  animation: lightAimLeft 4.8s ease-in-out infinite alternate;
+}
+
+.scroll-light--right {
+  right: -18vw;
+  top: 22vh;
+  width: 72vw;
+  height: 28vh;
+  background: linear-gradient(252deg, transparent 0 18%, color-mix(in srgb, var(--accent) 24%, transparent) 44%, transparent 74%);
+  transform: translate3d(var(--light-right-x), var(--light-right-y), 0) rotate(11deg);
+  animation: lightAimRight 5.6s ease-in-out infinite alternate;
+}
+
+.scroll-light--center {
+  left: 18vw;
+  top: -8vh;
+  width: 64vw;
+  height: 34vh;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-two) 18%, transparent), transparent 72%);
+  transform: translate3d(var(--light-center-x), var(--light-center-y), 0) rotate(8deg);
+  animation: lightAimCenter 6.2s ease-in-out infinite alternate;
+}
+
+.scroll-background__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 0 50%, color-mix(in srgb, var(--background) 40%, transparent) 92%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--background) 50%, transparent), transparent 18%, transparent 72%, color-mix(in srgb, var(--background) 62%, transparent));
+  opacity: 0.98;
 }
 
 .liquid-glass {
@@ -116,8 +226,8 @@ body::before {
     linear-gradient(135deg, color-mix(in srgb, var(--surface) 86%, white 8%), color-mix(in srgb, var(--surface) 72%, transparent)),
     linear-gradient(120deg, rgba(255, 255, 255, 0.32), transparent 44%);
   box-shadow: 0 24px 90px rgba(2, 6, 23, 0.12);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(145%);
+  -webkit-backdrop-filter: blur(20px) saturate(145%);
 }
 
 .dark .liquid-glass {
@@ -163,4 +273,145 @@ body::before {
 
 .focus-ring:focus {
   box-shadow: 0 0 0 4px var(--ring);
+}
+
+
+.journey-line {
+  overflow: hidden;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--primary) 24%, transparent), transparent);
+}
+
+.journey-line::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--journey-progress);
+  background: linear-gradient(to bottom, transparent, var(--primary), color-mix(in srgb, var(--accent) 80%, var(--primary)), transparent);
+  box-shadow: 0 0 24px var(--ring);
+  transition: height 80ms linear;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition:
+    opacity 360ms ease-out,
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.journey-reveal .liquid-glass {
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 260ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.journey-reveal .liquid-glass:hover {
+  transform: translate3d(0, -5px, 0);
+}
+
+@keyframes atmosphereShift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+    opacity: 0.62;
+  }
+  to {
+    transform: translate3d(1.5%, 1%, 0) scale(1.03);
+    opacity: 0.82;
+  }
+}
+
+@keyframes gridBreathing {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 74px 74px;
+  }
+}
+
+@keyframes streakSoftMove {
+  from {
+    opacity: 0.18;
+  }
+  to {
+    opacity: 0.34;
+  }
+}
+
+@keyframes lightAimLeft {
+  from {
+    opacity: 0.46;
+  }
+  to {
+    opacity: 0.76;
+  }
+}
+
+@keyframes lightAimRight {
+  from {
+    opacity: 0.42;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+
+@keyframes lightAimCenter {
+  from {
+    opacity: 0.32;
+  }
+  to {
+    opacity: 0.58;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-shell {
+    width: min(100% - 1rem, 100%);
+  }
+
+  .scroll-background__base {
+    opacity: 0.56;
+  }
+
+  .scroll-background__streaks {
+    opacity: 0.18;
+  }
+
+  .scroll-background__grid {
+    opacity: 0.16;
+  }
+
+  .scroll-light {
+    opacity: 0.42;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
 }

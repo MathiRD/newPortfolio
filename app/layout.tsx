@@ -3,7 +3,6 @@ import { cookies, headers } from "next/headers";
 import Script from "next/script";
 import "./globals.css";
 import {
-  normalizeColorPalette,
   normalizeLocale,
   normalizeThemeMode
 } from "@/lib/preferences";
@@ -20,14 +19,11 @@ async function getInitialPreferences() {
 
   let locale = cookieStore.get("portfolio_locale")?.value;
   let themeMode = cookieStore.get("portfolio_theme_mode")?.value;
-  let colorPalette = cookieStore.get("portfolio_color_palette")?.value;
-
   if (clientId && redis) {
     try {
       const savedPreferences = await redis.hgetall(`portfolio:preferences:${clientId}`);
       locale = savedPreferences.locale || locale;
       themeMode = savedPreferences.themeMode || themeMode;
-      colorPalette = savedPreferences.colorPalette || colorPalette;
     } catch {
       // Cookies are enough for rendering.
     }
@@ -36,7 +32,7 @@ async function getInitialPreferences() {
   return {
     locale: normalizeLocale(locale ?? headers().get("accept-language")),
     themeMode: normalizeThemeMode(themeMode),
-    colorPalette: normalizeColorPalette(colorPalette)
+    colorPalette: "ocean" as const
   };
 }
 
@@ -47,13 +43,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     (function () {
       try {
         var serverMode = ${JSON.stringify(preferences.themeMode)};
-        var serverPalette = ${JSON.stringify(preferences.colorPalette)};
-
         var storedMode = localStorage.getItem('portfolio_theme_mode');
-        var storedPalette = localStorage.getItem('portfolio_color_palette');
 
         var mode = ['system', 'light', 'dark'].indexOf(storedMode) >= 0 ? storedMode : serverMode;
-        var palette = ['ocean', 'emerald', 'violet'].indexOf(storedPalette) >= 0 ? storedPalette : serverPalette;
+        var palette = 'ocean';
 
         var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         var shouldUseDark = mode === 'dark' || (mode === 'system' && prefersDark);
@@ -63,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         document.documentElement.classList.add('palette-' + palette);
         document.documentElement.dataset.themeMode = mode;
         document.documentElement.dataset.colorPalette = palette;
+        localStorage.setItem('portfolio_color_palette', palette);
       } catch (error) {}
     })();
   `;

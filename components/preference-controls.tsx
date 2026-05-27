@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
-import {
-  ColorPalette,
-  Locale,
-  ThemeMode,
-  colorPalettes,
-  supportedColorPalettes
-} from "@/lib/preferences";
+import { ColorPalette, Locale, ThemeMode } from "@/lib/preferences";
 
 type PreferenceControlsProps = {
   locale: Locale;
@@ -17,52 +11,35 @@ type PreferenceControlsProps = {
 };
 
 const preferenceCookieMaxAge = 60 * 60 * 24 * 365;
+const fixedColorPalette: ColorPalette = "ocean";
 
-export function PreferenceControls({
-  locale,
-  themeMode,
-  colorPalette
-}: PreferenceControlsProps) {
+export function PreferenceControls({ locale, themeMode }: PreferenceControlsProps) {
   const [selectedThemeMode, setSelectedThemeMode] = useState<ThemeMode>(themeMode);
-  const [selectedColorPalette, setSelectedColorPalette] = useState<ColorPalette>(colorPalette);
 
   useEffect(() => {
     const storedThemeMode = readStoredThemeMode() ?? themeMode;
-    const storedColorPalette = readStoredColorPalette() ?? colorPalette;
 
     setSelectedThemeMode(storedThemeMode);
-    setSelectedColorPalette(storedColorPalette);
-    applyVisualPreferences(storedThemeMode, storedColorPalette);
+    applyVisualPreferences(storedThemeMode);
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     function handleSystemThemeChange() {
       const currentThemeMode = readCurrentThemeMode(storedThemeMode);
-      const currentColorPalette = readCurrentColorPalette(storedColorPalette);
 
       if (currentThemeMode === "system") {
-        applyVisualPreferences(currentThemeMode, currentColorPalette);
+        applyVisualPreferences(currentThemeMode);
       }
     }
 
     mediaQuery.addEventListener("change", handleSystemThemeChange);
     return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
-  }, [themeMode, colorPalette]);
+  }, [themeMode]);
 
   function handleThemeModeChange(nextThemeMode: ThemeMode) {
-    const currentColorPalette = readCurrentColorPalette(selectedColorPalette);
-
     setSelectedThemeMode(nextThemeMode);
     persistPreference("portfolio_theme_mode", nextThemeMode);
-    applyVisualPreferences(nextThemeMode, currentColorPalette);
-  }
-
-  function handleColorPaletteChange(nextColorPalette: ColorPalette) {
-    const currentThemeMode = readCurrentThemeMode(selectedThemeMode);
-
-    setSelectedColorPalette(nextColorPalette);
-    persistPreference("portfolio_color_palette", nextColorPalette);
-    applyVisualPreferences(currentThemeMode, nextColorPalette);
+    applyVisualPreferences(nextThemeMode);
   }
 
   function toggleLocale() {
@@ -103,46 +80,26 @@ export function PreferenceControls({
           );
         })}
       </div>
-
-      <div className="liquid-glass flex items-center gap-1 rounded-full p-1">
-        {supportedColorPalettes.map((palette) => {
-          const isActive = selectedColorPalette === palette;
-
-          return (
-            <button
-              key={palette}
-              type="button"
-              onClick={() => handleColorPaletteChange(palette)}
-              className={`focus-ring inline-flex h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold transition hover:-translate-y-0.5 ${
-                isActive ? "button-primary" : "text-muted hover:bg-white/20"
-              }`}
-              aria-label={`Set ${colorPalettes[palette].label} palette`}
-            >
-              <span className={`h-2.5 w-2.5 rounded-full ${colorPalettes[palette].dotClassName}`} />
-              {colorPalettes[palette].label}
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }
 
-function applyVisualPreferences(themeMode: ThemeMode, colorPalette: ColorPalette) {
+function applyVisualPreferences(themeMode: ThemeMode) {
   const root = document.documentElement;
   const shouldUseDark =
     themeMode === "dark" ||
     (themeMode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   root.classList.toggle("dark", shouldUseDark);
-  root.classList.remove("palette-ocean", "palette-emerald", "palette-violet");
-  root.classList.add(`palette-${colorPalette}`);
+  root.classList.remove("palette-emerald", "palette-violet");
+  root.classList.add("palette-ocean");
 
   root.dataset.themeMode = themeMode;
-  root.dataset.colorPalette = colorPalette;
+  root.dataset.colorPalette = fixedColorPalette;
 
   localStorage.setItem("portfolio_theme_mode", themeMode);
-  localStorage.setItem("portfolio_color_palette", colorPalette);
+  localStorage.setItem("portfolio_color_palette", fixedColorPalette);
+  persistPreference("portfolio_color_palette", fixedColorPalette);
 }
 
 function persistPreference(name: string, value: string) {
@@ -158,28 +115,11 @@ function readCurrentThemeMode(fallbackThemeMode: ThemeMode): ThemeMode {
   return storedThemeMode ?? fallbackThemeMode;
 }
 
-function readCurrentColorPalette(fallbackColorPalette: ColorPalette): ColorPalette {
-  const datasetColorPalette = document.documentElement.dataset.colorPalette;
-  if (isColorPalette(datasetColorPalette)) return datasetColorPalette;
-
-  const storedColorPalette = readStoredColorPalette();
-  return storedColorPalette ?? fallbackColorPalette;
-}
-
 function readStoredThemeMode(): ThemeMode | null {
   const value = localStorage.getItem("portfolio_theme_mode");
   return isThemeMode(value) ? value : null;
 }
 
-function readStoredColorPalette(): ColorPalette | null {
-  const value = localStorage.getItem("portfolio_color_palette");
-  return isColorPalette(value) ? value : null;
-}
-
 function isThemeMode(value: unknown): value is ThemeMode {
   return value === "system" || value === "light" || value === "dark";
-}
-
-function isColorPalette(value: unknown): value is ColorPalette {
-  return value === "ocean" || value === "emerald" || value === "violet";
 }

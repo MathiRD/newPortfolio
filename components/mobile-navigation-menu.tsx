@@ -125,6 +125,13 @@ export function MobileNavigationMenu({ locale, themeMode }: MobileNavigationMenu
                   {copy.navAbout}
                 </a>
                 <a
+                  href="#journey"
+                  onClick={closeMenu}
+                  className="rounded-2xl bg-white px-4 py-3 text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
+                >
+                  {locale === "pt" ? "Trajetória" : "Journey"}
+                </a>
+                <a
                   href="#projects"
                   onClick={closeMenu}
                   className="rounded-2xl bg-white px-4 py-3 text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
